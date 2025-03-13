@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
              const formContainer = document.getElementById("formContainer")
             //formContainer.innerHTML = "<p>hay algo</p>"
-            alert("datos encontrados")
+            //alert("datos encontrados")
             const tableSelect = document.getElementById("tableSelect");
             data.forEach(table => {
                 const option = document.createElement("option");
@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 displayTableData(data);
 
                 // Fetch table structure for the selected table
-                console.log(`http://diecanush.com.ar/delsur/api/${tableName}/table_structure`);
+                //console.log(`http://diecanush.com.ar/delsur/api/${tableName}/table_structure`);
                 fetch(`http://diecanush.com.ar/delsur/api/${tableName}/table_structure`)
                     .then(response => response.json())
                     .then(tableStructure => {
@@ -65,6 +65,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const cardBody = document.createElement("div");
             cardBody.className = "card-body";
+
+            console.log(Object.entries(record))
 
             // Iterate through record properties and display them
             for (const [key, value] of Object.entries(record)) {
@@ -183,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 input.className = "form-control";
                 input.name = column.nombre;
                 input.id = column.nombre;
-                input.placeholder = column.nombre;
+                input.placeholder = column.comentario || column.nombre;
     
                 // Adjust input type based on column type
                 switch (column.tipo.toLowerCase()) {
