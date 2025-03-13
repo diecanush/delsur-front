@@ -169,10 +169,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const fieldContainer = document.createElement("div");
         fieldContainer.className = "form-group";
     
-        const label = document.createElement("label");
+        /*const label = document.createElement("label");
         label.htmlFor = column.nombre;
         label.textContent = column.comentario || column.nombre; // Use "comentario" as caption if available
-        fieldContainer.appendChild(label);
+        fieldContainer.appendChild(label);*/
     
         if (column.nombre === "url_imagen") {
             console.log("es una imagen");
