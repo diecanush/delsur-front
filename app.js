@@ -161,51 +161,59 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to create input fields based on column type
     function createInputField(column) {
         console.log(column);
-
+    
+        const fieldContainer = document.createElement("div");
+        fieldContainer.className = "form-group";
+    
+        const label = document.createElement("label");
+        label.htmlFor = column.nombre;
+        label.textContent = column.comentario || column.nombre; // Use "comentario" as caption if available
+        fieldContainer.appendChild(label);
+    
         if (column.nombre === "url_imagen") {
             console.log("es una imagen");
-            return createUrlField(column);
-        }else{
-    
+            fieldContainer.appendChild(createUrlField(column));
+        } else {
             if (column.foreign_key !== null) {
                 // Handle foreign key
-                return createSelectField(column);
+                fieldContainer.appendChild(createSelectField(column));
             } else {
-                
-                    // Handle other column types
-                    const input = document.createElement("input");
-                    input.className = "form-control";
-                    input.name = column.nombre;
-                    input.id = column.nombre;
-                    input.placeholder = column.nombre;
-
-                    // Adjust input type based on column type
-                    switch (column.tipo.toLowerCase()) {
-                        case "int":
-                        case "int(11)":
-                        case "bigint":
-                        case "smallint":
-                        case "tinyint":
-                        case "double":
-                            input.type = "number";
-                            break;
-                        case "text":
-                        case "varchar":
-                        case "char":
-                            input.type = "text";
-                            break;
-                        case "date":
-                            input.type = "date";
-                            break;
-                        // Handle other column types as needed
-                        default:
-                            input.type = "text";
-                            break;
-                    }
-
-                    return input;
+                // Handle other column types
+                const input = document.createElement("input");
+                input.className = "form-control";
+                input.name = column.nombre;
+                input.id = column.nombre;
+                input.placeholder = column.nombre;
+    
+                // Adjust input type based on column type
+                switch (column.tipo.toLowerCase()) {
+                    case "int":
+                    case "int(11)":
+                    case "bigint":
+                    case "smallint":
+                    case "tinyint":
+                    case "double":
+                        input.type = "number";
+                        break;
+                    case "text":
+                    case "varchar":
+                    case "char":
+                        input.type = "text";
+                        break;
+                    case "date":
+                        input.type = "date";
+                        break;
+                    // Handle other column types as needed
+                    default:
+                        input.type = "text";
+                        break;
+                }
+    
+                fieldContainer.appendChild(input);
             }
         }
+    
+        return fieldContainer;
     }
     
 
