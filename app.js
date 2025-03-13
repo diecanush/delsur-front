@@ -37,25 +37,29 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(`http://diecanush.com.ar/delsur/api/${tableName}`)
             .then(response => response.json())
             .then(data => {
-                // Display data as cards
-                displayTableData(data);
-
                 // Fetch table structure for the selected table
-                //console.log(`http://diecanush.com.ar/delsur/api/${tableName}/table_structure`);
                 fetch(`http://diecanush.com.ar/delsur/api/${tableName}/table_structure`)
                     .then(response => response.json())
                     .then(tableStructure => {
+                        // Create a map of field names to comentarios
+                        const fieldComments = {};
+                        tableStructure.forEach(column => {
+                            fieldComments[column.nombre] = column.comentario || column.nombre;
+                        });
+
+                        // Display data as cards
+                        displayTableData(data, fieldComments);
+
                         // Create a form for adding a new record
                         createAddRecordForm(tableStructure);
                     })
                     .catch(error => console.error(JSON.stringify(error)));
-
             })
             .catch(error => console.error("Error fetching table data:", error));
     }
 
     // Function to display data as cards
-    function displayTableData(data) {
+    function displayTableData(data, fieldComments) {
         const cardsContainer = document.getElementById("cardsContainer");
         cardsContainer.innerHTML = ""; // Clear previous content
 
@@ -66,12 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const cardBody = document.createElement("div");
             cardBody.className = "card-body";
 
-            console.log(Object.entries(record))
-
             // Iterate through record properties and display them
             for (const [key, value] of Object.entries(record)) {
                 const cardText = document.createElement("p");
-                cardText.textContent = `${key}: ${value}`;
+                cardText.textContent = `${fieldComments[key]}: ${value}`; // Use comentario instead of field name
                 cardBody.appendChild(cardText);
             }
 
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to create input fields based on column type
     function createInputField(column) {
-        console.log(column);
+        //console.log(column);
     
         const fieldContainer = document.createElement("div");
         fieldContainer.className = "form-group";
