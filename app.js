@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Fetch tables and populate dropdown
-    let url_api = "http://localhost/delsur/api";
+    let url_api = "http://diecanush.com.ar/delsur/api";
     fetch(url_api+"/tables")
         .then(response => response.json())
         .then(data => {
