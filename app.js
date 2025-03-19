@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Fetch tables and populate dropdown
-    let url_api = "http://diecanush.com.ar/delsur/api";
+    let url_api = "https://diecanush.com.ar/delsur/api";
     fetch(url_api+"/tables")
         .then(response => response.json())
         .then(data => {
@@ -59,16 +59,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Function to display data as cards
     function displayTableData(data, fieldComments) {
         const cardsContainer = document.getElementById("cardsContainer");
-        cardsContainer.innerHTML = ""; // Clear previous content
-
+        cardsContainer.innerHTML = ""; // Limpiar contenido previo
+        cardsContainer.className = "row"; // Asegurarse de que el contenedor tenga la clase row
+    
         data.forEach(record => {
+            // Crear una columna responsiva
+            const col = document.createElement("div");
+            col.className = "col-xl-4 col-sm-12 col-md-12";
+    
+            // Crear la tarjeta con Bootstrap
             const card = document.createElement("div");
-            card.className = "col-md-4 mb-4 border";
-
+            card.className = "card h-100"; // h-100 para que la tarjeta ocupe el alto completo de la columna
+    
+            // Crear el cuerpo de la tarjeta
             const cardBody = document.createElement("div");
             cardBody.className = "card-body";
-
-            // Iterate through record properties and display them
+    
+            // Recorrer los campos del registro y agregarlos
             for (const [key, value] of Object.entries(record)) {
                 if (key === "url_imagen" && value) {
                     let urls;
@@ -81,82 +88,84 @@ document.addEventListener("DOMContentLoaded", function () {
                         urls = [value];
                     }
                     
-                    // Crear un contenedor para el slider
+                    // Crear el contenedor del slider
                     const sliderContainer = document.createElement("div");
-                    sliderContainer.style.position = "relative";
-                    sliderContainer.style.overflow = "hidden";
+                    sliderContainer.className = "position-relative overflow-hidden mx-auto";
                     sliderContainer.style.width = "100%";
-                    sliderContainer.style.maxWidth = "400px"; // Ajusta este valor según tu diseño
-                    sliderContainer.style.margin = "0 auto";
-                    
-                    // Crear el elemento de imagen que se mostrará
+                    sliderContainer.style.maxWidth = "400px"; // Ajustar según diseño
+    
+                    // Imagen a mostrar inicialmente
                     const sliderImg = document.createElement("img");
                     sliderImg.src = urls[0];
                     sliderImg.alt = fieldComments[key] || key;
-                    sliderImg.style.width = "100%";
-                    sliderImg.style.display = "block";
+                    sliderImg.className = "img-fluid d-block"; // img-fluid para responsive
                     sliderContainer.appendChild(sliderImg);
-                    
-                    // Crear botón "anterior"
+    
+                    // Botón "anterior"
                     const prevButton = document.createElement("button");
                     prevButton.textContent = "<";
-                    prevButton.style.position = "absolute";
+                    prevButton.className = "btn btn-secondary position-absolute";
                     prevButton.style.top = "50%";
                     prevButton.style.left = "10px";
                     prevButton.style.transform = "translateY(-50%)";
                     sliderContainer.appendChild(prevButton);
-                    
-                    // Crear botón "siguiente"
+    
+                    // Botón "siguiente"
                     const nextButton = document.createElement("button");
                     nextButton.textContent = ">";
-                    nextButton.style.position = "absolute";
+                    nextButton.className = "btn btn-secondary position-absolute";
                     nextButton.style.top = "50%";
                     nextButton.style.right = "10px";
                     nextButton.style.transform = "translateY(-50%)";
                     sliderContainer.appendChild(nextButton);
-                    
-                    // Variable para controlar el índice de la imagen actual
+    
+                    // Control del índice actual
                     let currentIndex = 0;
-                    
                     prevButton.addEventListener("click", function() {
                         currentIndex = (currentIndex - 1 + urls.length) % urls.length;
                         sliderImg.src = urls[currentIndex];
                     });
-                    
                     nextButton.addEventListener("click", function() {
                         currentIndex = (currentIndex + 1) % urls.length;
                         sliderImg.src = urls[currentIndex];
                     });
-                    
-                    // Agregar el slider al contenedor de la tarjeta
+    
                     cardBody.appendChild(sliderContainer);
-                }else {
-                    // Mostrar otros campos como texto
+                } else {
+                    // Para los demás campos, se muestran en un párrafo con la clase card-text
                     const cardText = document.createElement("p");
+                    cardText.className = "card-text";
                     cardText.textContent = `${fieldComments[key]}: ${value}`;
                     cardBody.appendChild(cardText);
                 }
             }
-
+    
             card.appendChild(cardBody);
-
+    
+            // Crear un pie de tarjeta para los botones de acciones
+            const cardFooter = document.createElement("div");
+            cardFooter.className = "card-footer d-flex justify-content-between";
+    
             // Botón para editar
             const editButton = document.createElement("button");
             editButton.innerText = "Editar";
             editButton.className = "btn btn-warning";
-            editButton.addEventListener("click", () => editRecord(record)); // Llamada a la función de edición
-            card.appendChild(editButton);
-
+            editButton.addEventListener("click", () => editRecord(record));
+            cardFooter.appendChild(editButton);
+    
             // Botón para eliminar
             const deleteButton = document.createElement("button");
-            deleteButton.className = "btn btn-danger";
             deleteButton.innerText = "Eliminar";
-            deleteButton.addEventListener("click", () => confirmDelete(record[Object.keys(record)[0]])); // Llamada a la función de eliminación
-            card.appendChild(deleteButton);
-
-            cardsContainer.appendChild(card);
+            deleteButton.className = "btn btn-danger";
+            deleteButton.addEventListener("click", () => confirmDelete(record[Object.keys(record)[0]]));
+            cardFooter.appendChild(deleteButton);
+    
+            card.appendChild(cardFooter);
+            col.appendChild(card);
+            cardsContainer.appendChild(col);
         });
     }
+
 
     //Function to populate the form to edit
     function editRecord(record){
@@ -174,11 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
         submitButton.id = 'submitButton'
         submitButton.textContent = "Update Record";
         submitButton.className = "btn btn-warning";
-        submitButton.addEventListener("click", function () {
-            updateRecord(record);
-        })
+        
         const form = document.getElementById("form");
         form.appendChild(submitButton);
+        document.getElementById("submitButton").addEventListener("click", function(e) {
+            updateRecord(e, record);
+        });
         
         form.scrollIntoView();
     }
@@ -294,6 +304,8 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.name = column.nombre + "[]";
         fileInput.placeholder = column.nombre;
         fileInput.multiple = true; // Permite seleccionar varios archivos
+        //fileInput.accept = "image/*"; // Solo imágenes
+        //fileInput.capture = "environment";
         return fileInput;
     }
     
@@ -320,27 +332,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     // Function to update a record using FormData
-    function updateRecord(record){
+    async function updateRecord(event, record) {
+        // Prevenir el envío por defecto si se trata de un submit de formulario
+        event.preventDefault();
+    
         const selectedTable = document.getElementById("tableSelect").value;
         const id = record[Object.keys(record)[0]];
         const formElement = document.getElementById("form");
         const formData = new FormData(formElement);
     
-        fetch(`${url_api}/${selectedTable}/${id}`, {
-            method: "POST", // Se usa POST en lugar de PUT
-            headers: {
-                "X-HTTP-Method-Override": "PUT" // Se indica que es PUT
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
+        try {
+            const response = await fetch(`${url_api}/${selectedTable}/${id}`, {
+                method: "POST", // Se envía como POST
+                headers: {
+                    "X-HTTP-Method-Override": "PUT"
+                },
+                body: formData
+            });
+            const data = await response.json();
             console.log("Respuesta PUT:", data);
-            // Recargar datos de la tabla seleccionada después de actualizar el registro
             loadTableData(selectedTable);
-        })
-        .catch(error => console.error("Error updating record:", error));
+        } catch (error) {
+            console.error("Error updating record:", error);
+        }
     }
+
     
     
     // FIN de las modificaciones que usan FormData
