@@ -207,6 +207,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     case "date":
                         input.type = "date";
                         break;
+                    case "boolean":
+                        input.type = "checkbox";
+                        break;
                     // Handle other column types as needed
                     default:
                         input.type = "text";
@@ -364,16 +367,42 @@ function confirmDelete(id){
     }
 }
 
-function imageLoad(imageFile){
-    // Suponiendo que "imageFile" tiene la imagen seleccionada
-
+function imageLoad(imageFile) {
+    resizeImage(imageFile, 1024, 1024, function(resizedDataUrl) {
+      // Aquí tienes la imagen redimensionada en resizedDataUrl (base64)
+      console.log("Imagen redimensionada:", resizedDataUrl);
+      // Enviar resizedDataUrl en el formulario o asignarlo a un campo oculto
+    });
+  }
+  
+  function resizeImage(file, maxWidth, maxHeight, callback) {
     const reader = new FileReader();
-    reader.readAsDataURL(imageFile); 
-    reader.onload = () => {
-    const base64Image = reader.result; // aquí tendrás la imagen en base64
-    
-    // enviar esta base64Image en el formulario
-    
-    }
-    return base64Image;
-}
+    reader.onload = function(event) {
+      const img = new Image();
+      img.onload = function() {
+        let width = img.width;
+        let height = img.height;
+        
+        // Calcula el ratio para mantener la relación de aspecto
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        // Crea un canvas para dibujar la imagen redimensionada
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convierte el canvas a DataURL (puedes ajustar la calidad)
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+        callback(dataUrl);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+      
